@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 
 namespace Receptionist.Bot.Bots
 {
-    public class ReceptionistBot (FoundationaLLMService foundationaLLMService) : ActivityHandler
+    public class ReceptionistBot (FoundationaLLMService foundationaLLMService, ILogger<ReceptionistBot> logger) : ActivityHandler
     {
         private readonly ConcurrentDictionary<string, string> usersAndSessions = new();
 
@@ -23,13 +23,17 @@ namespace Receptionist.Bot.Bots
                 usersAndSessions.TryAdd(turnContext.Activity.From.Id, session.Id);
                 sessionId = session.Id;
             }
+            else
+            {
+                logger.LogInformation("Using existing session {sessionId}", sessionId);
+            }
 
             var agentResponse = await foundationaLLMService.GetFoundationaLLMResponse(
                 new FoundationaLLMRequestModel
                 {
                     UserPrompt = turnContext.Activity.Text,
                     SessionId = sessionId,
-                    AgentName = "FoundationaLLM"
+                    AgentName = "Receptionist"
                 }
             );
             await turnContext.SendActivityAsync(MessageFactory.Text(agentResponse.Text, agentResponse.Text), cancellationToken);
