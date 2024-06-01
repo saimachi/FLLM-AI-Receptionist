@@ -20,13 +20,13 @@ builder.Services.AddHttpClient<FoundationaLLMService>(client =>
 })
 .AddHttpMessageHandler<BearerTokenHandler>();
 
-builder.Services.AddSingleton<BotFrameworkAuthentication, ConfigurationBotFrameworkAuthentication>();
-builder.Services.AddSingleton<IBotFrameworkHttpAdapter, BotFrameworkHttpAdapter>();
+builder.Services.AddSingleton<IBotFrameworkHttpAdapter, CloudAdapter>();
 builder.Services.AddTransient<IBot, ReceptionistBot>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
+app.UseWebSockets();
 app.MapDefaultControllerRoute();
 
 app.Run();
