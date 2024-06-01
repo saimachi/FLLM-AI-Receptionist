@@ -41,7 +41,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="lib\graph\__init__.py" />
-    <Compile Include="lib\main.py" />
+    <Compile Include="lib\openai\calendar_completion_service.py" />
     <Compile Include="lib\openai\__init__.py" />
     <Compile Include="lib\__init__.py" />
     <Compile Include="Receptionist.CalendarAgent.py" />
