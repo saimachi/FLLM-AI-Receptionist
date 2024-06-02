@@ -4,10 +4,14 @@ using System.Text.Json;
 
 namespace Receptionist.Bot.Services
 {
+    /// <summary>
+    /// Utilities to interface with the FoundationaLLM Core API.
+    /// </summary>
     public class FoundationaLLMService(HttpClient httpClient) : IFoundationaLLMService
     {
         private readonly HttpClient _httpClient = httpClient;
 
+        /// <inheritdoc/>
         public async Task<SessionResponseModel> CreateSession()
         {
             var newSession = await _httpClient.PostAsync("/sessions", null);
@@ -19,6 +23,7 @@ namespace Receptionist.Bot.Services
             throw new Exception($"Failed to create new session: {newSession.ReasonPhrase}");
         }
 
+        /// <inheritdoc/>
         public async Task<FoundationaLLMResponseModel> GetFoundationaLLMResponse(FoundationaLLMRequestModel request)
         {
             var completionResponse = await _httpClient.PostAsync($"/sessions/{request.SessionId}/completion", JsonContent.Create(request));

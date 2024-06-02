@@ -1,5 +1,8 @@
 ﻿namespace Receptionist.Bot.Configuration
 {
+    /// <summary>
+    /// appsettings.json key reference names.
+    /// </summary>
     public static class Constants
     {
         public readonly static string FOUNDATIONALLM_COREAPI_CONFIG_SECTION = "FoundationaLLM:APIs:CoreAPI";

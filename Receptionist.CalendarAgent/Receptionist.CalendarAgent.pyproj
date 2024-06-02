@@ -42,6 +42,9 @@
     </Compile>
     <Compile Include="lib\graph\__init__.py" />
     <Compile Include="lib\openai\calendar_completion_service.py" />
+    <Compile Include="lib\openai\tools_catalog.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="lib\openai\__init__.py" />
     <Compile Include="lib\__init__.py" />
     <Compile Include="Receptionist.CalendarAgent.py" />
@@ -66,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".env" />
+    <Content Include=".env.sample" />
     <Content Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

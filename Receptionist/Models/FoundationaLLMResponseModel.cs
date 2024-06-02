@@ -2,6 +2,10 @@
 
 namespace Receptionist.Bot.Models
 {
+    /* 
+     * This class is from the FoundationaLLM Source Code: https://github.com/solliancenet/foundationallm
+     * It will be removed once the C# SDK is provided.
+    */
     public class FoundationaLLMResponseModel
     {
         /// <summary>

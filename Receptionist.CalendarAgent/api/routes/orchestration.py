@@ -6,19 +6,20 @@ from lib.openai.calendar_completion_service import CalendarCompletionService
 
 # Initialize API routing
 router = APIRouter(
-    prefix='/orchestration',
-    tags=['orchestration'],
-    responses={404: {'description':'Not found'}}
+    prefix="/orchestration",
+    tags=["orchestration"],
+    responses={404: {"description": "Not found"}}
 )
 
-@router.post('/completion')
+@router.post("/completion")
 async def get_completion(
     request: Request,
     openai_service: Annotated[CalendarCompletionService, Depends(CalendarCompletionService)]
 ) -> CompletionResponse:
     body = await request.json()
     completion_request = CompletionRequestBase(**body)
+    completion_response = await openai_service.handle_completion_request(completion_request)
     return CompletionResponse(
-        user_prompt=completion_request.user_prompt,
-        completion=await openai_service.handle_completion_request(completion_request)
+        user_prompt = completion_request.user_prompt,
+        completion = completion_response
     )
