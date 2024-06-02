@@ -6,10 +6,21 @@ using System.Collections.Concurrent;
 
 namespace Receptionist.Bot.Bots
 {
+    /// <summary>
+    /// Implementation of the voice conversation agent using Microsoft Bot Framework.
+    /// </summary>
+    /// <param name="foundationaLLMService"></param>
+    /// <param name="logger"></param>
     public class ReceptionistBot (FoundationaLLMService foundationaLLMService, ILogger<ReceptionistBot> logger) : ActivityHandler
     {
         private readonly ConcurrentDictionary<string, string> usersAndSessions = new();
 
+        /// <summary>
+        /// Callback method called when a message is received.
+        /// </summary>
+        /// <param name="turnContext"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             // TODO: Check text for hateful content
@@ -39,6 +50,13 @@ namespace Receptionist.Bot.Bots
             await turnContext.SendActivityAsync(MessageFactory.Text(agentResponse.Text, agentResponse.Text), cancellationToken);
         }
 
+        /// <summary>
+        /// Callback method called when a member joins.
+        /// </summary>
+        /// <param name="membersAdded"></param>
+        /// <param name="turnContext"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             var welcomeText = "Hello and welcome!";
