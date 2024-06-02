@@ -1,4 +1,5 @@
 import json
+from foundationallm.models.orchestration import CompletionRequestBase
 from lib.configuration import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_API_VERSION, AZURE_OPENAI_DEPLOYMENT_NAME
 from lib.graph.graph_service import GraphService, graph_service
 from typing import Annotated
@@ -22,28 +23,38 @@ class CalendarCompletionService:
         self.azure_openai_client = azure_openai_client
         self.graph_service = graph_service
     
-    async def handle_completion_request(self, request: str):
+    async def handle_completion_request(self, request: CompletionRequestBase) -> str:
         messages = [
+            *[
+                {
+                    "role": message.sender.lower(),
+                    "content": message.text
+                } for message in request.message_history
+            ],
             {
                 "role": "user",
-                "content": request
+                "content": request.user_prompt
             }
         ]
         tools = [
             {
                 "type": "function",
                 "function": {
-                    "name": "search_calendar_events",
-                    "description": "Find calendar events matching a given search term.",
+                    "name": "does_calendar_event_exist",
+                    "description": "Check if an appointment exists for the given user and time.",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "search_term": {
+                            "name": {
                                 "type": "string",
-                                "description": "Event search term. This could be the user's name, for example.",
+                                "description": "Name of the user for the appointment.",
+                            },
+                            "time": {
+                                "type": "string",
+                                "description": "The time of the appointment. There should be NO date information and do NOT include the time of day (AM/PM). For example, '2:00' and '11:00' are VALID, while '2:00 on May 23rd', '2:00 PM today', and '11:00 PM' are INVALID.",
                             }
                         },
-                        "required": ["search_term"],
+                        "required": ["name"],
                     },
                 },
             }
@@ -52,37 +63,22 @@ class CalendarCompletionService:
             model=AZURE_OPENAI_DEPLOYMENT_NAME,
             messages=messages,
             tools=tools,
-            tool_choice="auto",  # auto is default, but we'll be explicit
+            tool_choice="auto",
         )
         response_message = response.choices[0].message
         tool_calls = response_message.tool_calls
-        # Step 2: check if the model wanted to call a function
         if tool_calls:
-            # Step 3: call the function
-            # Note: the JSON response may not always be valid; be sure to handle errors
-            available_functions = {
-                "search_calendar_events": self.graph_service.search_calendar_events
-            }  # only one function in this example, but you can have multiple
-            messages.append(response_message)  # extend conversation with assistant's reply
-            # Step 4: send the info for each function call and function response to the model
-            for tool_call in tool_calls:
-                function_name = tool_call.function.name
-                function_to_call = available_functions[function_name]
-                function_args = json.loads(tool_call.function.arguments)
-                function_response = await function_to_call(
-                    search_term = function_args.get("search_term")
-                )
-                messages.append(
-                    {
-                        "tool_call_id": tool_call.id,
-                        "role": "tool",
-                        "name": function_name,
-                        "content": function_response,
-                    }
-                )  # extend conversation with function response
-            second_response = self.azure_openai_client.chat.completions.create(
-                model=AZURE_OPENAI_DEPLOYMENT_NAME,
-                messages=messages,
-            )  # get a new response from the model where it can see the function response
-            return second_response.choices[0].message.content
-        return "I'm sorry, but I was unable to locate any matching calendar events."
+            tool_call = tool_calls[0]
+            function_args = json.loads(tool_call.function.arguments)
+            if function_args.get("name") is None:
+                return "Please provide your name."
+            print(f'Name: {function_args["name"]}')
+            print(f'Time: {function_args.get("time", "")}')
+            appointment_exists = await self.graph_service.does_calendar_event_exist(
+                name = function_args["name"],
+                time = function_args.get("time", "")
+            )
+            if appointment_exists:
+                return "Yes, we have an appointment scheduled for you. Please have a seat."
+            return "Sorry, but we couldn't find an appointment matching that name and time."
+        return "I'm sorry, but I'm unable to handle your request."

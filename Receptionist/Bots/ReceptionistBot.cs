@@ -33,7 +33,7 @@ namespace Receptionist.Bot.Bots
                 {
                     UserPrompt = turnContext.Activity.Text,
                     SessionId = sessionId,
-                    AgentName = "Receptionist"
+                    AgentName = "CalendarScheduler"
                 }
             );
             await turnContext.SendActivityAsync(MessageFactory.Text(agentResponse.Text, agentResponse.Text), cancellationToken);

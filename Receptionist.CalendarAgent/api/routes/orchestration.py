@@ -11,14 +11,14 @@ router = APIRouter(
     responses={404: {'description':'Not found'}}
 )
 
-@router.get('/completion')
+@router.post('/completion')
 async def get_completion(
-    # request: Request,
+    request: Request,
     openai_service: Annotated[CalendarCompletionService, Depends(CalendarCompletionService)]
 ) -> CompletionResponse:
-    # completion_request = CompletionRequestBase(**request)
-    completion_request = CompletionRequestBase(user_prompt="I am here for a workout appointment. Could you please check if I have an appointment scheduled?")
+    body = await request.json()
+    completion_request = CompletionRequestBase(**body)
     return CompletionResponse(
         user_prompt=completion_request.user_prompt,
-        completion=await openai_service.handle_completion_request(completion_request.user_prompt)
+        completion=await openai_service.handle_completion_request(completion_request)
     )

@@ -21,7 +21,7 @@ namespace Receptionist.Bot.Services
 
         public async Task<FoundationaLLMResponseModel> GetFoundationaLLMResponse(FoundationaLLMRequestModel request)
         {
-            var completionResponse = await _httpClient.PostAsync("/orchestration/completion", JsonContent.Create(request));
+            var completionResponse = await _httpClient.PostAsync($"/sessions/{request.SessionId}/completion", JsonContent.Create(request));
             if (completionResponse.IsSuccessStatusCode)
             {
                 var completionResponseData = await completionResponse.Content.ReadAsStringAsync();
