@@ -4,7 +4,7 @@ This repository implements a conversational, multi-agent solution with [Foundati
 
 ## Demo
 
-![Demonstration GIF.](./img/demo.gif)
+![Demonstration GIF.](./img/demo.mkv)
 
 ## Setup
 
